@@ -171,9 +171,16 @@ class Croupier(object):
             print(joueur.prenom + " a " + str(joueur.jetons) + " jetons")
 
     def determine_gagnant(self):
+        liste_joueur_en_lice = []
+        for joueur in self.liste_joueur:
+            if joueur.couche == 0:
+                liste_joueur_en_lice.append(joueur)
+
+        # for joueur in liste_joueur_en_lice:
+            
         print("Celui ci a gagné : ")
-        print(self.liste_joueur[0].prenom)
-        return self.liste_joueur[0]
+        print(liste_joueur_en_lice[0].prenom)
+        return liste_joueur_en_lice[0]
 
     def reste_au_moins_deux_joueurs_tour(self):
         nbre_survivant = 0
@@ -182,7 +189,10 @@ class Croupier(object):
                 nbre_survivant = nbre_survivant + 1
                 gagnant = joueur
         if nbre_survivant < 2:
-            self.remporte_le_pot(gagnant)
+            try:
+                self.remporte_le_pot(gagnant)
+            except NameError:
+                print('Plus personne n\'est en lice')
             return 0
         else:
             return 1
@@ -217,11 +227,11 @@ class Croupier(object):
 
     def fin_tour(self):
         self.jetons = 0
-        self.RAZ_cartes()
+        self.raz_cartes()
         if self.reste_au_moins_deux_joueurs_partie():
             self.reinitialise_donne()
 
-    def RAZ_cartes(self):
+    def raz_cartes(self):
         self.jetons = 0
         self.carte_flop_1 = 0
         self.carte_flop_2 = 0
@@ -235,7 +245,7 @@ class Croupier(object):
 
     def tour_enchere(self, tour):
         if tour == 'preflop':
-        # Petite et grande blinde
+            # Petite et grande blinde
             self.mise(self.liste_joueur[(self.donneur+1) % len(self.liste_joueur)], self.petite_blinde, 'preflop')
             self.mise(self.liste_joueur[(self.donneur+2) % len(self.liste_joueur)], self.grande_blinde, 'preflop')
 
@@ -246,11 +256,11 @@ class Croupier(object):
                     self.joueur_parle(self.liste_joueur[joueur_qui_parle], tour)
 
         # Deuxième phase : on tourne jusqu'à tant que tout le monde soit aligné
-            kk = 1
+            kk = 0
             while self.condition_passage_tour(tour):
                 if self.reste_au_moins_deux_joueurs_tour():
-                    self.joueur_parle(self.liste_joueur[joueur_qui_parle], tour)
                     joueur_qui_parle = (self.donneur + 2 + kk) % len(self.liste_joueur)
+                    self.joueur_parle(self.liste_joueur[joueur_qui_parle], tour)
                     kk = kk+1
                 else:
                     break
@@ -262,11 +272,11 @@ class Croupier(object):
                     self.joueur_parle(self.liste_joueur[joueur_qui_parle], tour)
 
             # Deuxième phase : on tourne jusqu'à tant que tout le monde soit aligné
-            kk = 1
+            kk = 0
             while self.condition_passage_tour(tour):
                 if self.reste_au_moins_deux_joueurs_tour():
-                    self.joueur_parle(self.liste_joueur[joueur_qui_parle], tour)
                     joueur_qui_parle = (self.donneur + 2 + kk) % len(self.liste_joueur)
+                    self.joueur_parle(self.liste_joueur[joueur_qui_parle], tour)
                     kk = kk + 1
                 else:
                     break
@@ -328,18 +338,17 @@ class Croupier(object):
 
     def montre_ses_cartes(self, joueur):
         print('**************      **********')
-        print(' Cartes de ' + joueur.prenom+ ' :')
+        print(' Cartes de ' + joueur.prenom + ' :')
         print('**************      ' + self.LISTE_CARTES[joueur.carte_1])
         print('**************      ' + self.LISTE_CARTES[joueur.carte_2])
         print('**************      **********')
-        
+
+
 def input_number(message):
-    kk = 1
-    while kk:
+    while True:
         try:
             user_input = int(input(message))
         except ValueError:
             print("Not an integer! Try again.")
         else:
-            kk = 0
             return user_input
